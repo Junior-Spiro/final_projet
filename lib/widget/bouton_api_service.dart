@@ -19,6 +19,40 @@ class _BoutonApiServiceState extends State<BoutonApiService> {
   bool _isLoading = false;
   Map<String, dynamic>? _donneesMeteo;
 
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ElevatedButton.icon(
+            onPressed: _isLoading ? null : _recupererDonnees,
+            icon: Icon(Icons.cloud_done, color: Colors.brown),
+            label: Text(
+              'Obtenir la météo',
+              style: TextStyle(color: Colors.black),
+            ),
+            style: ButtonStyle(
+              elevation: WidgetStatePropertyAll(6),
+              backgroundColor: WidgetStatePropertyAll(Colors.brown[200]),
+            ),
+          ),
+          const SizedBox(height: 20),
+          if (_isLoading) CircularProgressIndicator(color: Colors.brown),
+          if (_donneesMeteo != null && !_isLoading)
+            DonneesMeteoWidget(donneesMeteo: _donneesMeteo!),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _villeController.dispose();
+    super.dispose();
+  }
+
   Future<void> _recupererDonnees() async {
     final ville = _villeController.text.trim();
     if (ville.isEmpty) {
@@ -51,50 +85,5 @@ class _BoutonApiServiceState extends State<BoutonApiService> {
             false; // En cas d'erreur, l'indicateur de chargement est mis à false
       });
     }
-  }
-
-  @override
-  void dispose() {
-    _villeController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Prévisions météo',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        leading: (Icon(Icons.water_drop)),
-        backgroundColor: Colors.brown[200],
-        foregroundColor: Colors.black,
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton.icon(
-              onPressed: _isLoading ? null : _recupererDonnees,
-              icon: Icon(Icons.cloud_done, color: Colors.brown),
-              label: Text(
-                'Obtenir la météo',
-                style: TextStyle(color: Colors.black),
-              ),
-              style: ButtonStyle(
-                elevation: WidgetStatePropertyAll(6),
-                backgroundColor: WidgetStatePropertyAll(Colors.brown[200]),
-              ),
-            ),
-            const SizedBox(height: 20),
-            if (_isLoading) CircularProgressIndicator(color: Colors.brown),
-            if (_donneesMeteo != null && !_isLoading)
-              DonneesMeteoWidget(donneesMeteo: _donneesMeteo!),
-          ],
-        ),
-      ),
-    );
   }
 }
