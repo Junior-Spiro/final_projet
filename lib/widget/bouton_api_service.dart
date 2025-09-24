@@ -3,19 +3,19 @@ import 'dart:convert';
 import 'package:final_projet/widget/donnees_meteo_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:final_projet/models/lieu.dart';
 
 //C'est une classe  qui représente l’interface utilisateur principale de l’application
 
 class BoutonApiService extends StatefulWidget {
-  const BoutonApiService({super.key});
+  final Lieu lieu;
+  const BoutonApiService({super.key, required this.lieu});
 
   @override
   State<BoutonApiService> createState() => _BoutonApiServiceState();
 }
 
 class _BoutonApiServiceState extends State<BoutonApiService> {
-  final TextEditingController _villeController = TextEditingController();
-
   bool _isLoading = false;
   Map<String, dynamic>? _donneesMeteo;
 
@@ -28,18 +28,18 @@ class _BoutonApiServiceState extends State<BoutonApiService> {
         children: [
           ElevatedButton.icon(
             onPressed: _isLoading ? null : _recupererDonnees,
-            icon: Icon(Icons.cloud_done, color: Colors.brown),
+            icon: Icon(Icons.cloud_done, color: Colors.black87),
             label: Text(
               'Obtenir la météo',
               style: TextStyle(color: Colors.black),
             ),
             style: ButtonStyle(
               elevation: WidgetStatePropertyAll(6),
-              backgroundColor: WidgetStatePropertyAll(Colors.brown[200]),
+              backgroundColor: WidgetStatePropertyAll(Colors.green[50]),
             ),
           ),
           const SizedBox(height: 20),
-          if (_isLoading) CircularProgressIndicator(color: Colors.brown),
+          if (_isLoading) CircularProgressIndicator(color: Colors.white),
           if (_donneesMeteo != null && !_isLoading)
             DonneesMeteoWidget(donneesMeteo: _donneesMeteo!),
         ],
@@ -47,17 +47,8 @@ class _BoutonApiServiceState extends State<BoutonApiService> {
     );
   }
 
-  @override
-  void dispose() {
-    _villeController.dispose();
-    super.dispose();
-  }
-
   Future<void> _recupererDonnees() async {
-    final ville = _villeController.text.trim();
-    if (ville.isEmpty) {
-      return;
-    }
+    final ville = widget.lieu.ville; // récupérer la ville depuis widget.lieu
     setState(() {
       _isLoading = true;
     });

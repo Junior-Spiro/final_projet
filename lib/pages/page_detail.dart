@@ -20,6 +20,53 @@ class PageDetail extends StatelessWidget {
           style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.05),
         ),
       ),
+      endDrawer: Drawer(
+        child: ListView(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.edit_document, color: Colors.black87),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ModifierLieuPage(
+                      lieu: lieu,
+                      lieuId: lieu.id,
+                      lieuData: lieu.toMap(),
+                    ),
+                  ),
+                );
+              },
+              title: Text(
+                'Modifier',
+                style: TextStyle(fontWeight: FontWeight.w700),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.delete_forever_outlined,
+                color: Colors.red,
+              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SupprimerLieuPage(
+                      lieu,
+                      lieuId: lieu.id,
+                      lieuNom: lieu.nom,
+                    ),
+                  ),
+                );
+              },
+              title: Text(
+                'Supprimer',
+                style: TextStyle(fontWeight: FontWeight.w700),
+              ),
+            ),
+          ],
+        ),
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -49,114 +96,62 @@ class PageDetail extends StatelessWidget {
                 color: Colors.grey[300],
                 child: const Icon(Icons.place, size: 100, color: Colors.grey),
               ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 15),
 
             // Informations principales centrées et structurées
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    lieu.nom,
-                    style: const TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    lieu.ville,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontStyle: FontStyle.italic,
-                      color: Colors.black54,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    lieu.description,
-                    style: const TextStyle(fontSize: 20, color: Colors.black87),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+            Card(
+              margin: EdgeInsets.all(16),
+              color: Colors.green.shade50,
+              elevation: 8,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
               ),
-            ),
-            const SizedBox(height: 32),
-
-            // Bouton obtenir la météo de la ville saisie, en plein largeur, stylisé
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 48),
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  // Action du bouton météo, à implémenter selon votre logique
-                  // Par exemple, ouvrir une page météo avec lieu.ville
-                },
-                icon: const Icon(Icons.cloud, size: 24),
-                label: const Text(
-                  'Obtenir la météo de la ville',
-                  style: TextStyle(fontSize: 18),
-                ),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  backgroundColor: Colors.blueAccent,
+              child: Padding(
+                padding: const EdgeInsets.all(15),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      lieu.nom,
+                      style: const TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      lieu.ville,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontStyle: FontStyle.italic,
+                        color: Colors.black54,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      lieu.description,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        color: Colors.black87,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Boutons Modifier & Supprimer alignés et centrés avec espaces
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.blue, size: 28),
-                  tooltip: 'Modifier',
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ModifierLieuPage(
-                          lieu: lieu,
-                          lieuId: lieu.id,
-                          lieuData: lieu.toMap(),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(width: 48),
-                IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red, size: 28),
-                  tooltip: 'Supprimer',
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SupprimerLieuPage(
-                          lieu,
-                          lieuId: lieu.id,
-                          lieuNom: lieu.nom,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ],
             ),
 
             const SizedBox(height: 40),
 
-            // Si vous souhaitez garder le bouton API Service (externe)
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24),
-              child: BoutonApiService(),
+            //Le bouton API Service (externe)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: BoutonApiService(lieu: lieu),
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: 24),
           ],
         ),
       ),

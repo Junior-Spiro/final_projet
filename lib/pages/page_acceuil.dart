@@ -52,7 +52,12 @@ class _PageAccueilState extends State<PageAccueil> {
             minSpacing: 10,
             children: lieux.map((lieu) {
               return Card(
-                margin: const EdgeInsets.only(top: 15, left: 5, right: 5),
+                margin: const EdgeInsets.only(
+                  top: 15,
+                  left: 5,
+                  right: 5,
+                  bottom: 15,
+                ),
                 elevation: 3,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),

@@ -26,6 +26,8 @@ class SupprimerLieuPage extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
                 Navigator.of(context).pop(); // fermer dialog
                 Navigator.of(context).pop(); // revenir page liste
               },
