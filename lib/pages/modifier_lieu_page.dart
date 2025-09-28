@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:final_projet/services/auth_service.dart';
 import 'package:final_projet/services/firebase_service.dart';
 import 'package:final_projet/widget/image_prise.dart';
 import 'package:flutter/material.dart';
@@ -7,11 +8,11 @@ import 'package:final_projet/models/lieu.dart';
 class ModifierLieuPage extends StatefulWidget {
   final Lieu lieu;
   const ModifierLieuPage({
-    Key? key,
+    super.key,
     required this.lieu,
     required Map<String, dynamic> lieuData,
     required String lieuId,
-  }) : super(key: key);
+  });
 
   @override
   State<ModifierLieuPage> createState() => _ModifierLieuPageState();
@@ -30,6 +31,8 @@ class _ModifierLieuPageState extends State<ModifierLieuPage> {
     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
     textStyle: const TextStyle(fontWeight: FontWeight.bold),
   );
+
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -59,6 +62,18 @@ class _ModifierLieuPageState extends State<ModifierLieuPage> {
   Future<void> _modifierLieu() async {
     if (_formKey.currentState!.validate()) {
       try {
+        setState(() {
+          _isLoading = true;
+        });
+        final user = AuthService().getCurrentUser();
+        if (user == null) {
+          _afficherErreurDialog('Utilisateur non connecté');
+          setState(() {
+            _isLoading = false;
+          });
+          return;
+        }
+
         await FirebaseService.modifierLieu(
           lieuId: widget.lieu.id,
           nom: _nomController.text.trim(),
@@ -67,8 +82,14 @@ class _ModifierLieuPageState extends State<ModifierLieuPage> {
           anciennePhotoUrl: _photoActuelle,
           nouvelleImage: _nouvelleImage,
         );
+        setState(() {
+          _isLoading = false;
+        });
         _afficherSuccesDialog();
       } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
         _afficherErreurDialog(e.toString());
       }
     }
@@ -116,7 +137,7 @@ class _ModifierLieuPageState extends State<ModifierLieuPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Modifier le lieu'),
-        backgroundColor: Colors.black87,
+        backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
       body: Padding(
@@ -125,7 +146,10 @@ class _ModifierLieuPageState extends State<ModifierLieuPage> {
           key: _formKey,
           child: ListView(
             children: [
-              ImagePrise(onPhotoSelectionne: _onPhotoSelectionne),
+              ImagePrise(
+                onPhotoSelectionne: _onPhotoSelectionne,
+                imageUrl: _photoActuelle,
+              ),
               const SizedBox(height: 20),
               TextFormField(
                 controller: _nomController,
@@ -154,8 +178,18 @@ class _ModifierLieuPageState extends State<ModifierLieuPage> {
               const SizedBox(height: 40),
               ElevatedButton(
                 style: styleBouton,
-                onPressed: _modifierLieu,
-                child: const Text('Modifier'),
+                onPressed: _isLoading ? null : _modifierLieu,
+                child: _isLoading
+                    ? SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          backgroundColor: Colors.black54,
+                          strokeWidth: 2.5,
+                        ),
+                      )
+                    : const Text('Modifier'),
               ),
             ],
           ),

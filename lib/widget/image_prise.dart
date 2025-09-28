@@ -7,9 +7,9 @@ typedef PhotoSelectionCallback = void Function(File image);
 
 class ImagePrise extends StatefulWidget {
   final PhotoSelectionCallback onPhotoSelectionne;
+  String? imageUrl;
 
-  const ImagePrise({Key? key, required this.onPhotoSelectionne})
-    : super(key: key);
+  ImagePrise({super.key, required this.onPhotoSelectionne, this.imageUrl});
 
   @override
   State<ImagePrise> createState() => _ImagePriseState();
@@ -17,7 +17,14 @@ class ImagePrise extends StatefulWidget {
 
 class _ImagePriseState extends State<ImagePrise> {
   File? _image;
+  String? _imageUrl;
   final ImagePicker _picker = ImagePicker();
+
+  @override
+  void initState() {
+    super.initState();
+    _imageUrl = widget.imageUrl;
+  }
 
   Future<void> _showPickerDialog() async {
     showModalBottomSheet(
@@ -55,6 +62,7 @@ class _ImagePriseState extends State<ImagePrise> {
     if (picked != null) {
       setState(() {
         _image = File(picked.path);
+        _imageUrl = null; // La nouvelle image remplace ancienne URL
       });
       widget.onPhotoSelectionne(_image!);
     }
@@ -65,17 +73,41 @@ class _ImagePriseState extends State<ImagePrise> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
+        Padding(
           padding: EdgeInsets.only(bottom: 8.0),
-          child: Text(
-            'Ajouter une image',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-          ),
+          child: (_image != null || _imageUrl != null)
+              ? Text(
+                  'Modifier l\'image',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                )
+              : Text(
+                  'Ajouter une image',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
         ),
         GestureDetector(
           onTap: _showPickerDialog,
-          child: _image == null
-              ? Container(
+          child: _image != null
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.file(
+                    _image!,
+                    height: 300,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                )
+              : (_imageUrl != null && _imageUrl!.isNotEmpty)
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    _imageUrl!,
+                    height: 300,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                )
+              : Container(
                   height: 150,
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey),
@@ -84,15 +116,6 @@ class _ImagePriseState extends State<ImagePrise> {
                   ),
                   child: const Center(
                     child: Icon(Icons.photo, size: 50, color: Colors.grey),
-                  ),
-                )
-              : ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.file(
-                    _image!,
-                    height: 300,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
                   ),
                 ),
         ),

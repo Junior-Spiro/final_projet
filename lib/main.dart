@@ -21,6 +21,7 @@ class MonApplication extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Compagny Hubs',
+      theme: ThemeData(visualDensity: VisualDensity.adaptivePlatformDensity),
       home: FluxAuthentification(lieu: lieu),
     );
   }

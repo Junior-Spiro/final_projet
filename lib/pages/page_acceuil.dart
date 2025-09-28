@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 import 'package:final_projet/models/lieu.dart';
+import 'ecran_profil.dart';
 
 class PageAccueil extends StatefulWidget {
   const PageAccueil({super.key, required this.lieu});
@@ -17,24 +18,35 @@ class PageAccueil extends StatefulWidget {
 class _PageAccueilState extends State<PageAccueil> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  int _currentIndex = 0;
+
+  setCurrentIndex(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Compagny Hubs'),
-        centerTitle: true,
-        backgroundColor: Colors.black87,
-        foregroundColor: Colors.white,
-      ),
-      endDrawer: pageMenuNav(),
-      body: StreamBuilder<QuerySnapshot>(
+    Widget currentBody;
+    bool showAppBar;
+
+    if (_currentIndex == 0) {
+      // Page Acceuil : appBar visible
+      showAppBar = true;
+      currentBody = StreamBuilder<QuerySnapshot>(
         stream: _firestore.collection('lieux').snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const Center(child: Text("Erreur de chargement"));
           }
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return Container(
+              width: 300,
+              margin: const EdgeInsets.all(8),
+              color: Colors.grey[300],
+              child: Icon(Icons.broken_image_outlined),
+            );
           }
           final lieuxDocs = snapshot.data!.docs;
           final lieux = lieuxDocs
@@ -51,69 +63,74 @@ class _PageAccueilState extends State<PageAccueil> {
             desiredItemWidth: 200,
             minSpacing: 10,
             children: lieux.map((lieu) {
-              return Card(
-                margin: const EdgeInsets.only(
-                  top: 15,
-                  left: 5,
-                  right: 5,
-                  bottom: 15,
-                ),
-                elevation: 3,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: InkWell(
-                  onTap: () {
-                    // naviguer vers la page de détails en passant l'objet Lieu
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => PageDetail(lieu: lieu)),
-                    );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (lieu.photoUrl.isNotEmpty)
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.network(
-                              lieu.photoUrl,
-                              height: 100,
+              return SizedBox(
+                height: 250,
+                child: Card(
+                  margin: const EdgeInsets.only(
+                    top: 15,
+                    left: 5,
+                    right: 5,
+                    bottom: 8,
+                  ),
+                  elevation: 5,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: InkWell(
+                    onTap: () {
+                      // naviguer vers la page de détails en passant l'objet Lieu
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PageDetail(lieu: lieu),
+                        ),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (lieu.photoUrl.isNotEmpty)
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.network(
+                                lieu.photoUrl,
+                                height: 100,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                          else
+                            Container(
+                              height: 200,
                               width: double.infinity,
-                              fit: BoxFit.cover,
+                              color: Colors.grey[300],
+                              child: const Icon(
+                                Icons.place,
+                                size: 80,
+                                color: Colors.grey,
+                              ),
                             ),
-                          )
-                        else
-                          Container(
-                            height: 100,
-                            width: double.infinity,
-                            color: Colors.grey[300],
-                            child: const Icon(
-                              Icons.place,
-                              size: 80,
+                          const SizedBox(height: 4),
+                          Text(
+                            lieu.nom,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          Text(
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            lieu.description,
+                            style: const TextStyle(
                               color: Colors.grey,
+                              fontSize: 15,
                             ),
                           ),
-                        const SizedBox(height: 8),
-                        Text(
-                          lieu.nom,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        Text(
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          lieu.description,
-                          style: const TextStyle(
-                            color: Colors.grey,
-                            fontSize: 15,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -121,6 +138,40 @@ class _PageAccueilState extends State<PageAccueil> {
             }).toList(),
           );
         },
+      );
+    } else {
+      // Page Profil
+      showAppBar = false;
+      currentBody = ProfilPage();
+    }
+
+    return Scaffold(
+      appBar: showAppBar
+          ? AppBar(
+              elevation: 20,
+              title: const Text('Compagny Hubs'),
+              centerTitle: true,
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.teal,
+            )
+          : null,
+      endDrawer: pageMenuNav(),
+      body: currentBody, // Affiche la page selon l'index sélectionné
+
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        //permet de naviger vers la page appuyée
+        onTap: (index) => setCurrentIndex(index),
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white54,
+        backgroundColor: Colors.teal,
+        selectedFontSize: 16,
+        elevation: 15,
+
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Acceuil'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
+        ],
       ),
     );
   }

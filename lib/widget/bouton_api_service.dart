@@ -17,6 +17,7 @@ class BoutonApiService extends StatefulWidget {
 
 class _BoutonApiServiceState extends State<BoutonApiService> {
   bool _isLoading = false;
+  String? _erreur;
   Map<String, dynamic>? _donneesMeteo;
 
   @override
@@ -35,11 +36,11 @@ class _BoutonApiServiceState extends State<BoutonApiService> {
             ),
             style: ButtonStyle(
               elevation: WidgetStatePropertyAll(6),
-              backgroundColor: WidgetStatePropertyAll(Colors.green[50]),
+              backgroundColor: WidgetStatePropertyAll(Colors.green[300]),
             ),
           ),
           const SizedBox(height: 20),
-          if (_isLoading) CircularProgressIndicator(color: Colors.white),
+          if (_isLoading) CircularProgressIndicator(color: Colors.green[200]),
           if (_donneesMeteo != null && !_isLoading)
             DonneesMeteoWidget(donneesMeteo: _donneesMeteo!),
         ],
@@ -67,11 +68,13 @@ class _BoutonApiServiceState extends State<BoutonApiService> {
         });
       } else {
         setState(() {
+          _erreur = "Ville introuvable ou erreur du serveur.";
           _isLoading = false;
         });
       }
     } catch (_) {
       setState(() {
+        _erreur = "Impossible de récupérer les données.";
         _isLoading =
             false; // En cas d'erreur, l'indicateur de chargement est mis à false
       });

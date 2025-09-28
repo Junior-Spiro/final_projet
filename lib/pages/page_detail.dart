@@ -13,8 +13,8 @@ class PageDetail extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.black87,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.green[100],
+        foregroundColor: Colors.teal,
         title: Text(
           'Informations sur ${lieu.nom}',
           style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.05),

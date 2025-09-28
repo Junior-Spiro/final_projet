@@ -15,10 +15,11 @@ class DonneesMeteoWidget extends StatelessWidget {
     final iconUrl = 'https://openweathermap.org/img/wn/$iconCode@2x.png';
 
     return Card(
+      color: Colors.green[300],
       margin: const EdgeInsets.symmetric(vertical: 12),
       elevation: 4,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(30.0),
         child: Column(
           children: [
             Text(

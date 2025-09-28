@@ -2,27 +2,40 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_projet/models/lieu.dart';
 import 'package:flutter/material.dart';
 
-class SupprimerLieuPage extends StatelessWidget {
+class SupprimerLieuPage extends StatefulWidget {
   final String lieuId;
   final String lieuNom;
 
-  SupprimerLieuPage(
+  const SupprimerLieuPage(
     Lieu lieu, {
     super.key,
     required this.lieuId,
     required this.lieuNom,
   });
 
+  @override
+  State<SupprimerLieuPage> createState() => _SupprimerLieuPageState();
+}
+
+class _SupprimerLieuPageState extends State<SupprimerLieuPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  bool _isLoading = false;
 
   Future<void> _supprimer(BuildContext context) async {
+    setState(() {
+      _isLoading = true;
+    });
     try {
-      await _firestore.collection('lieux').doc(lieuId).delete();
+      await _firestore.collection('lieux').doc(widget.lieuId).delete();
+      setState(() {
+        _isLoading = false;
+      });
+
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
           title: const Text('Succès'),
-          content: Text('Lieu "$lieuNom" supprimé avec succès.'),
+          content: Text('Lieu "${widget.lieuNom}" supprimé avec succès.'),
           actions: [
             TextButton(
               onPressed: () {
@@ -37,6 +50,10 @@ class SupprimerLieuPage extends StatelessWidget {
         ),
       );
     } catch (e) {
+      setState(() {
+        _isLoading = false; // masque l'indicateur en cas d'erreur
+      });
+
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -73,19 +90,21 @@ class SupprimerLieuPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Voulez-vous vraiment supprimer le lieu "$lieuNom" ?',
+              'Voulez-vous vraiment supprimer le lieu "${widget.lieuNom}" ?',
               style: const TextStyle(fontSize: 18),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 40),
-            ElevatedButton(
-              style: styleBoutonSupprimer,
-              onPressed: () => _supprimer(context),
-              child: const Text(
-                'Supprimer le lieu',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
+            _isLoading
+                ? const CircularProgressIndicator()
+                : ElevatedButton(
+                    style: styleBoutonSupprimer,
+                    onPressed: () => _supprimer(context),
+                    child: const Text(
+                      'Supprimer le lieu',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
           ],
         ),
       ),
