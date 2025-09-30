@@ -81,7 +81,7 @@ class _SupprimerLieuPageState extends State<SupprimerLieuPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Supprimer lieu'),
-        backgroundColor: Colors.black87,
+        backgroundColor: Colors.red,
         foregroundColor: Colors.white,
       ),
       body: Padding(

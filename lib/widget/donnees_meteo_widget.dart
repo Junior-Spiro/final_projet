@@ -17,7 +17,7 @@ class DonneesMeteoWidget extends StatelessWidget {
     return Card(
       color: Colors.green[300],
       margin: const EdgeInsets.symmetric(vertical: 12),
-      elevation: 4,
+      elevation: 10,
       child: Padding(
         padding: const EdgeInsets.all(30.0),
         child: Column(

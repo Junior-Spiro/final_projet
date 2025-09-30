@@ -120,8 +120,8 @@ class _AjoutLieuPageState extends State<AjoutLieuPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Ajouter un lieu'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.tealAccent,
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
