@@ -107,7 +107,6 @@ class _ModifierLieuPageState extends State<ModifierLieuPage> {
               Navigator.of(context).pop();
               Navigator.of(context).pop();
               Navigator.of(context).pop();
-              Navigator.of(context).pop();
             },
             child: const Text('OK', style: TextStyle(color: Colors.blue)),
           ),

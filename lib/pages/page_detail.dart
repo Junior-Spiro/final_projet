@@ -6,6 +6,10 @@ import 'package:final_projet/widget/donnees_meteo_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'modifier_lieu_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+final currentUser = FirebaseAuth.instance.currentUser;
+String? currentUid;
 
 class PageDetail extends StatefulWidget {
   final Lieu lieu;
@@ -25,6 +29,7 @@ class _PageDetailState extends State<PageDetail> {
   void initState() {
     super.initState();
     _recupererDonnees(); // lancement automatique
+    currentUid = FirebaseAuth.instance.currentUser?.uid;
   }
 
   Future<void> _recupererDonnees() async {
@@ -67,19 +72,18 @@ class _PageDetailState extends State<PageDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.green[100],
+        backgroundColor: Colors.indigo[50],
         foregroundColor: Colors.teal,
         title: Text(
           'Informations sur ${widget.lieu.nom}',
           style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.05),
         ),
-      ),
-      endDrawer: Drawer(
-        child: ListView(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.edit_document, color: Colors.black87),
-              onTap: () {
+        actions: [
+          ///widget.lieu.uid : UID du créateur du lieu
+          ///currentUid : UID de l’utilisateur connecté
+          if (widget.lieu.uid == currentUid) ...[
+            IconButton(
+              onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -91,17 +95,14 @@ class _PageDetailState extends State<PageDetail> {
                   ),
                 );
               },
-              title: Text(
-                'Modifier',
-                style: TextStyle(fontWeight: FontWeight.w700),
+              tooltip: 'Modifier',
+              icon: const Icon(
+                Icons.edit_location_outlined,
+                color: Colors.brown,
               ),
             ),
-            ListTile(
-              leading: const Icon(
-                Icons.delete_forever_outlined,
-                color: Colors.red,
-              ),
-              onTap: () {
+            IconButton(
+              onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -113,14 +114,13 @@ class _PageDetailState extends State<PageDetail> {
                   ),
                 );
               },
-              title: Text(
-                'Supprimer',
-                style: TextStyle(fontWeight: FontWeight.w700),
-              ),
+              icon: Icon(Icons.delete_forever_outlined, color: Colors.red),
+              tooltip: 'Supprimer',
             ),
           ],
-        ),
+        ],
       ),
+
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -197,7 +197,7 @@ class _PageDetailState extends State<PageDetail> {
               ),
             ),
 
-            //Le bouton API Service (externe)
+            //Service API
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: _isLoading

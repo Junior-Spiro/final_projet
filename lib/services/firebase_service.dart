@@ -31,6 +31,20 @@ class FirebaseService {
     }
   }
 
+  //Pour l'image de profil
+  static Future<String> uploadImageProfil(File image, String uid) async {
+    final storageRef = _otherStorage.ref().child('user_profil_photo/$uid.jpg');
+
+    try {
+      final uploadTask = storageRef.putFile(image);
+      final snapshot = await uploadTask;
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+      return downloadUrl;
+    } catch (e) {
+      throw Exception('Erreur lors de l\'upload de l\'image: $e');
+    }
+  }
+
   // Ajout d'un lieu : upload image dans le bucket du projet A, puis enregistrement dans Firestore du projet B
   static Future<void> ajouterLieu({
     required String uid,

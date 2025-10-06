@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 import 'package:final_projet/models/lieu.dart';
 import 'ecran_profil.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
 class PageAccueil extends StatefulWidget {
   const PageAccueil({super.key, required this.lieu});
@@ -158,7 +159,21 @@ class _PageAccueilState extends State<PageAccueil> {
       endDrawer: pageMenuNav(),
       body: currentBody, // Affiche la page selon l'index sélectionné
 
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: CurvedNavigationBar(
+        backgroundColor: Colors.white,
+        color: Colors.teal,
+        height: 60,
+        animationCurve: Curves.bounceOut,
+        animationDuration: Duration(milliseconds: 700),
+        items: <Widget>[
+          Icon(Icons.home_outlined, size: 30, color: Colors.white),
+          Icon(Icons.person, size: 30, color: Colors.white),
+        ],
+        onTap: (index) => setCurrentIndex(index),
+      ),
+
+      /*
+      BottomNavigationBar(
         currentIndex: _currentIndex,
         //permet de naviger vers la page appuyée
         onTap: (index) => setCurrentIndex(index),
@@ -172,7 +187,7 @@ class _PageAccueilState extends State<PageAccueil> {
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Acceuil'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
         ],
-      ),
+      ),*/
     );
   }
 

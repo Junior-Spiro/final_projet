@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:final_projet/services/firebase_service.dart';
 import 'package:final_projet/services/user_service.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,6 +11,24 @@ class AuthService {
   Stream<fb_auth.User?> get fluxUtilisateur => _auth.authStateChanges();
   final fb_auth.FirebaseAuth _auth = fb_auth.FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final UserService userService = UserService();
+
+  //Photo de profil
+  Future<void> ChangerPhotoProfil(File image) async {
+    final fb_auth.User? user = _auth.currentUser;
+    if (user == null) throw Exception('Utilisateur non connecté');
+
+    // Upload de l'image
+    final userPhotoUrl = await FirebaseService.uploadImageProfil(
+      image,
+      user.uid,
+    );
+
+    await user.updatePhotoURL(userPhotoUrl);
+    await user.reload();
+
+    await userService.sauvegarderUtilisateurFirebase(user);
+  }
 
   // Récupère l'utilisateur Firebase actuel en UserModel
   UserModel? _userFromFirebase(fb_auth.User? user) {
@@ -17,6 +38,7 @@ class AuthService {
       id: user.uid,
       email: user.email ?? '',
       displayName: user.displayName ?? '',
+      userPhotoUrl: '',
     );
   }
 
@@ -40,6 +62,7 @@ class AuthService {
         id: cred.user!.uid,
         email: email,
         displayName: displayName,
+        userPhotoUrl: '',
       );
 
       // Ajouter le document utilisateur dans Firestore
@@ -58,7 +81,7 @@ class AuthService {
   }
 
   // Connexion avec email et password
-  final userService = UserService();
+  //final userService = UserService();
 
   Future<fb_auth.User?> connexionParEmailAvecSauvegarde(
     String email,

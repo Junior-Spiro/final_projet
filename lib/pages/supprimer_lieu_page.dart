@@ -40,7 +40,6 @@ class _SupprimerLieuPageState extends State<SupprimerLieuPage> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                Navigator.of(context).pop();
                 Navigator.of(context).pop(); // fermer dialog
                 Navigator.of(context).pop(); // revenir page liste
               },
