@@ -1,5 +1,6 @@
 import 'package:final_projet/pages/ajout_lieu_page.dart';
 import 'package:final_projet/pages/page_detail.dart';
+import 'package:final_projet/pages/page_historique.dart';
 import 'package:final_projet/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -36,7 +37,10 @@ class _PageAccueilState extends State<PageAccueil> {
       // Page Acceuil : appBar visible
       showAppBar = true;
       currentBody = StreamBuilder<QuerySnapshot>(
-        stream: _firestore.collection('lieux').snapshots(),
+        stream: _firestore
+            .collection('lieux')
+            .orderBy('createdAt', descending: true)
+            .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const Center(child: Text("Erreur de chargement"));
@@ -140,10 +144,14 @@ class _PageAccueilState extends State<PageAccueil> {
           );
         },
       );
-    } else {
+    } else if (_currentIndex == 1) {
       // Page Profil
       showAppBar = false;
       currentBody = ProfilPage();
+    } else {
+      // Page Historique
+      showAppBar = false;
+      currentBody = PageHistorique();
     }
 
     return Scaffold(
@@ -168,6 +176,7 @@ class _PageAccueilState extends State<PageAccueil> {
         items: <Widget>[
           Icon(Icons.home_outlined, size: 30, color: Colors.white),
           Icon(Icons.person, size: 30, color: Colors.white),
+          Icon(Icons.history, size: 30, color: Colors.white),
         ],
         onTap: (index) => setCurrentIndex(index),
       ),

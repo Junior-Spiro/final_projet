@@ -60,16 +60,16 @@ class FirebaseService {
       // Crée un nouveau doc avec ID auto généré
       final docRef = collection.doc();
 
-      final lieu = Lieu(
-        id: docRef.id,
-        uid: uid,
-        nom: nom,
-        description: description,
-        ville: ville,
-        photoUrl: photoUrl,
-      );
-
-      await docRef.set(lieu.toMap());
+      // Prépare les données avec timestamp serveur pour createdAt
+      final data = {
+        'uid': uid,
+        'nom': nom,
+        'description': description,
+        'ville': ville,
+        'photoUrl': photoUrl,
+        'createdAt': FieldValue.serverTimestamp(), // <--- AJOUT
+      };
+      await docRef.set(data);
     } catch (e) {
       throw Exception('Erreur lors de l\'ajout du lieu: $e');
     }
@@ -102,6 +102,7 @@ class FirebaseService {
         photoUrl = await uploadImage(nouvelleImage);
       }
 
+      // Met à jour sans toucher createdAt
       await FirebaseFirestore.instance.collection('lieux').doc(lieuId).update({
         'nom': nom,
         'description': description,
@@ -111,5 +112,54 @@ class FirebaseService {
     } catch (e) {
       throw Exception('Erreur lors de la modification du lieu: $e');
     }
+  }
+
+  ///Méthode pour l'historique
+  /// Récupère un Stream des lieux ajoutés par l'utilisateur [uid].
+  ///
+  /// Les lieux sont triés par date d'ajout (supposée stockée dans 'createdAt') du plus récent au plus ancien.
+  /// [limit] permet de limiter le nombre de résultats, optionnel.
+  /// [filtreVille] permet de filtrer sur la ville, optionnel.
+  static Stream<List<Lieu>> getHistoriqueLieux({
+    required String uid,
+    int? limit,
+    String? filtreVille,
+  }) {
+    // Base de la requête : filter uid + order by createdAt
+    Query<Map<String, dynamic>> query = FirebaseFirestore.instance
+        .collection('lieux')
+        .where('uid', isEqualTo: uid)
+        .orderBy('createdAt', descending: true);
+
+    // Ajoute le filtre ville si non-null
+    if (filtreVille != null && filtreVille.isNotEmpty) {
+      query = query.where('ville', isEqualTo: filtreVille);
+    }
+
+    // Ajoute la limite si fournie
+    if (limit != null) {
+      query = query.limit(limit);
+    }
+
+    // Transforme en List<Lieu>
+    return query.snapshots().map((snap) {
+      return snap.docs.map((doc) {
+        final data = doc.data();
+        // Assure que createdAt est bien un Timestamp
+        final timestamp = data['createdAt'];
+        final createdAt = timestamp is Timestamp
+            ? timestamp.toDate()
+            : DateTime.now();
+        return Lieu(
+          id: doc.id,
+          uid: data['uid'] as String? ?? '',
+          nom: data['nom'] as String? ?? '',
+          description: data['description'] as String? ?? '',
+          ville: data['ville'] as String? ?? '',
+          photoUrl: data['photoUrl'] as String? ?? '',
+          createdAt: createdAt, // Assigne la date convertie
+        );
+      }).toList();
+    });
   }
 }

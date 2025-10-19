@@ -64,6 +64,7 @@ class FluxAuthentification extends StatelessWidget {
       ville: 'Ville par défaut',
       photoUrl: '',
       id: '',
+      createdAt: null,
     );
   }
 }
