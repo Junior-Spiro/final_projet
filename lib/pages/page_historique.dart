@@ -166,7 +166,7 @@ class _PageHistoriqueState extends State<PageHistorique> {
                     );
                   }
 
-                  //3- Données chargées avec succès
+                  //3- Données chargées avec succès mais vide
                   final lieux = snapshot.data ?? [];
                   if (lieux.isEmpty) {
                     return Center(
@@ -193,10 +193,13 @@ class _PageHistoriqueState extends State<PageHistorique> {
                         ),
                         child: ListTile(
                           leading: lieu.photoUrl.isNotEmpty
-                              ? Image.network(
-                                  lieu.photoUrl,
-                                  width: 50,
-                                  fit: BoxFit.cover,
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Image.network(
+                                    lieu.photoUrl,
+                                    width: 80,
+                                    fit: BoxFit.cover,
+                                  ),
                                 )
                               : const Icon(Icons.place_outlined, size: 48),
                           title: Text(lieu.nom),

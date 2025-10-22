@@ -126,6 +126,14 @@ class _PageAccueilState extends State<PageAccueil> {
                             ),
                           ),
                           Text(
+                            lieu.ville,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Colors.blueGrey,
+                              fontSize: 15,
+                            ),
+                          ),
+                          Text(
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             lieu.description,

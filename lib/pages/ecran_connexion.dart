@@ -8,7 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 ///Pour se connecter:
 ///jrspiro05@gmail.com ; mp:12345aze
 ///jrtrad23@gmail.com ; mp:12345aze
-///lefa2fale2@gmail.com; mp:Junior2002
+///lefa2fale2@gmail.com; mp: Junior2025
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key, required this.lieu});
